@@ -1,0 +1,3 @@
+# crontab 配置示例（在服务器上执行 crontab -e 后粘贴）
+# 分 时 日 月 周；每 3 小时运行一次（第 7 分钟触发，避开整点）
+7 */3 * * * /绝对路径/free-model-monitor/run.sh

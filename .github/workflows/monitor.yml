@@ -1,0 +1,37 @@
+name: free-model-monitor
+
+on:
+  schedule:
+    # 每 3 小时运行一次：UTC 每 3 小时的第 7 分钟（避开整点高峰以减少延迟）
+    # 对应北京时间 08:07、11:07、14:07、17:07、20:07、23:07、02:07、05:07，每天 8 次
+    - cron: "7 */3 * * *"
+  workflow_dispatch: {}   # 支持手动触发
+
+permissions:
+  contents: write         # 允许把更新后的快照库提交回仓库
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 运行监控
+        env:
+          # 在仓库 Settings → Secrets and variables → Actions 中配置
+          MONITOR_EMAIL_PASSWORD: ${{ secrets.MONITOR_EMAIL_PASSWORD }}
+        run: python main.py
+
+      - name: 提交更新后的快照
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/monitor.db
+          git diff --staged --quiet || git commit -m "chore: update snapshot [skip ci]"
+          git push

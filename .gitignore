@@ -1,0 +1,8 @@
+# 实际配置（含邮箱授权码），不提交
+config.json
+
+# 预览与临时文件
+preview/
+.preview/
+__pycache__/
+*.pyc
