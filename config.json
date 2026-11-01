@@ -3,9 +3,9 @@
     "smtp_host": "smtp.qq.com",
     "smtp_port": 465,
     "use_ssl": true,
-    "sender": "your_mailbox@qq.com",
-    "password": "在此填写邮箱SMTP授权码，或设置环境变量 MONITOR_EMAIL_PASSWORD",
-    "receivers": ["your_mailbox@qq.com"]
+    "sender": "2546833779@qq.com",
+    "password": "占位：真实授权码通过 GitHub Secret MONITOR_EMAIL_PASSWORD 注入",
+    "receivers": ["2546833779@qq.com"]
   },
   "sources": {
     "openrouter": {
