@@ -8,6 +8,28 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 
+
+class NotifierError(Exception):
+    pass
+
+
+def _validate_email_config(e):
+    """发送前校验，把配置缺失转成明确的中文错误而非底层编码异常。"""
+    sender = e.get("sender", "")
+    pwd = e.get("password", "")
+    if not sender or "your_mailbox" in sender:
+        raise NotifierError("发件邮箱仍是占位地址，请在 config.json 填写真实邮箱")
+    if not pwd or not pwd.strip():
+        raise NotifierError("邮箱授权码为空，请在 GitHub Secret 配置 MONITOR_EMAIL_PASSWORD")
+    try:
+        pwd.encode("ascii")
+    except UnicodeEncodeError:
+        raise NotifierError(
+            "邮箱授权码仍是中文占位文字，请在 GitHub 仓库添加 Secret "
+            "MONITOR_EMAIL_PASSWORD（QQ邮箱16位SMTP授权码）"
+        )
+
+
 # 变化类型 → 标签底色（仅用于区分，同时保留文字标签）
 TYPE_COLORS = {
     "free_added": ("#dcfce7", "#15803d"),
@@ -96,6 +118,7 @@ def _wrap(title, body):
 
 def send_email(cfg, subject, html_body):
     e = cfg["email"]
+    _validate_email_config(e)
     msg = MIMEMultipart("alternative")
     msg["From"] = e["sender"]
     msg["To"] = ", ".join(e["receivers"])
